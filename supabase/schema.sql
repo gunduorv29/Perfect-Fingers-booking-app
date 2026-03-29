@@ -8,6 +8,8 @@
 create table if not exists public.profiles (
   id          uuid references auth.users on delete cascade primary key,
   full_name   text,
+  email       text,
+
   phone       text,
   avatar_url  text,
   role        text not null default 'client' check (role in ('client', 'admin')),
@@ -24,6 +26,15 @@ create table if not exists public.services (
   deposit     numeric,
   icon        text default '✦',
   created_at  timestamptz default now()
+);
+
+-- ── BLOCKED DATES ──
+create table if not exists public.blocked_dates (
+  id         uuid default gen_random_uuid() primary key,
+  date       date not null,
+  reason     text,
+  all_day    boolean default true,
+  created_at timestamptz default now()
 );
 
 -- ── APPOINTMENTS ──
@@ -48,8 +59,9 @@ returns trigger
 language plpgsql security definer
 as $$
 begin
-  insert into public.profiles (id, full_name)
-  values (new.id, new.raw_user_meta_data->>'full_name');
+  insert into public.profiles (id, full_name, email)
+  values (new.id, new.raw_user_meta_data->>'full_name', new.email);
+
   return new;
 end;
 $$;
@@ -63,9 +75,10 @@ create trigger on_auth_user_created
 -- ============================================================
 -- ROW LEVEL SECURITY
 -- ============================================================
-alter table public.profiles     enable row level security;
-alter table public.services     enable row level security;
-alter table public.appointments enable row level security;
+alter table public.profiles       enable row level security;
+alter table public.services       enable row level security;
+alter table public.blocked_dates  enable row level security;
+alter table public.appointments   enable row level security;
 
 -- Drop existing policies first (safe to re-run)
 drop policy if exists "Users view own profile"        on public.profiles;
@@ -73,6 +86,8 @@ drop policy if exists "Users update own profile"      on public.profiles;
 drop policy if exists "Admin full access profiles"    on public.profiles;
 drop policy if exists "Anyone can view services"      on public.services;
 drop policy if exists "Admin manages services"        on public.services;
+drop policy if exists "Public read blocked dates"     on public.blocked_dates;
+drop policy if exists "Admin manages blocked dates"   on public.blocked_dates;
 drop policy if exists "Clients view own appointments" on public.appointments;
 drop policy if exists "Clients create appointments"   on public.appointments;
 drop policy if exists "Clients cancel own"            on public.appointments;
@@ -100,6 +115,17 @@ create policy "Anyone can view services"
 
 create policy "Admin manages services"
   on public.services for all
+  using (
+    exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
+  );
+
+-- Blocked Dates (public read for booking calendar, admin full)
+create policy "Public read blocked dates"
+  on public.blocked_dates for select
+  using (true);
+
+create policy "Admin manages blocked dates"
+  on public.blocked_dates for all
   using (
     exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
   );

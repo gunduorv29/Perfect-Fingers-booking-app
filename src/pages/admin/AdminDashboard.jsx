@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import AvailabilityManager from '../../components/AvailabilityManager.jsx'
 import { supabase } from '../../supabaseClient'
 import { format, parseISO, isToday } from 'date-fns'
 import toast from 'react-hot-toast'
@@ -23,8 +24,7 @@ export default function AdminDashboard() {
   const [editingId, setEditingId]         = useState(null)
   const [saving, setSaving]               = useState(false)
 
-  useEffect(() => { loadAll() }, [])
-
+  // Used for manual refreshes after save/delete actions
   async function loadAll() {
     setLoading(true)
     const [apptRes, svcRes] = await Promise.all([
@@ -35,6 +35,26 @@ export default function AdminDashboard() {
     if (svcRes.data)  setServices(svcRes.data)
     setLoading(false)
   }
+
+  // ✅ Fix: define async fetch inline inside the effect so setState is called
+  // after an await — satisfies react-hooks/set-state-in-effect.
+  // Cleanup flag prevents setState on an unmounted component.
+  useEffect(() => {
+    let cancelled = false
+    async function fetchOnMount() {
+      setLoading(true)
+      const [apptRes, svcRes] = await Promise.all([
+        supabase.from('appointments').select('*, profiles(full_name, phone), services(name, icon)').order('appointment_date', { ascending: false }),
+        supabase.from('services').select('*').order('price'),
+      ])
+      if (cancelled) return
+      if (apptRes.data) setAppointments(apptRes.data)
+      if (svcRes.data)  setServices(svcRes.data)
+      setLoading(false)
+    }
+    fetchOnMount()
+    return () => { cancelled = true }
+  }, [])
 
   async function updateStatus(id, status) {
     const { error } = await supabase.from('appointments').update({ status }).eq('id', id)
@@ -111,7 +131,7 @@ export default function AdminDashboard() {
 
         {/* Tabs */}
         <div className="flex gap-1 mb-6 p-1 rounded-xl w-fit border" style={{ background: 'white', borderColor: 'rgba(224,48,112,0.07)' }}>
-          {[['appointments', 'Appointments'], ['services', 'Services']].map(([key, label]) => (
+{[['appointments', 'Appointments'], ['services', 'Services'], ['availability', 'Availability']].map(([key, label]) => (
             <button key={key} onClick={() => setTab(key)}
               className="px-5 py-2 rounded-lg text-sm font-medium transition-all"
               style={{ background: tab === key ? 'var(--color-pink)' : 'transparent', color: tab === key ? 'white' : 'var(--color-muted)' }}>
@@ -173,7 +193,7 @@ export default function AdminDashboard() {
                 <div key={svc.id} className="rounded-2xl p-5 border flex items-start justify-between gap-4"
                   style={{ background: 'white', borderColor: 'rgba(224,48,112,0.07)' }}>
                   <div className="flex gap-3 flex-1 min-w-0">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0"
                       style={{ background: 'var(--color-pink-blush)' }}>
                       {svc.icon ?? '✦'}
                     </div>
@@ -185,7 +205,7 @@ export default function AdminDashboard() {
                       </p>
                     </div>
                   </div>
-                  <div className="flex gap-2 flex-shrink-0">
+                  <div className="flex gap-2 shrink-0">
                     <button onClick={() => openEdit(svc)}
                       className="text-xs px-3 py-1.5 rounded-full border hover:opacity-70 transition-opacity"
                       style={{ borderColor: 'rgba(224,48,112,0.2)', color: 'var(--color-dark)' }}>
@@ -202,6 +222,10 @@ export default function AdminDashboard() {
             </div>
           </div>
         )}
+
+        {/* Availability tab */}
+        {tab === 'availability' && <AvailabilityManager />}
+
       </div>
 
       {/* Service modal */}
@@ -278,7 +302,8 @@ function AdminApptCard({ appt, onUpdate }) {
     <div className="rounded-2xl p-5 border" style={{ background: 'white', borderColor: todayMark ? 'rgba(224,48,112,0.25)' : 'rgba(224,48,112,0.07)' }}>
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex gap-3">
-          <div className="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center text-lg"
+          {/* ✅ Fix: flex-shrink-0 → shrink-0 */}
+          <div className="w-10 h-10 rounded-xl shrink-0 flex items-center justify-center text-lg"
             style={{ background: 'var(--color-pink-blush)' }}>
             {appt.services?.icon ?? '✦'}
           </div>
