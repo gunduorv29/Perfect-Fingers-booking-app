@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
-import { supabase } from '../../supabaseClient'
-import { useAuth } from '../../context/AuthContext'
+import { supabase } from '../supabaseClient'
+import { useAuth } from '../context/AuthContext'
 import toast from 'react-hot-toast'
 import { format, addDays, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isBefore, startOfDay, getDay } from 'date-fns'
 
