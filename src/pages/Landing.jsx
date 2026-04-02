@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
+import Testimonials from '../components/Testimonials'
+import FAQ from '../components/FAQ'
+import Team from '../components/Team'
 
 const STEPS = [
   { n: '01', title: 'Choose Your Style', desc: 'Browse our full menu of protective styles, see pricing and estimated duration, and pick the one that fits you.' },
@@ -84,6 +87,42 @@ export default function Landing() {
               ))}
             </div>
           </div>
+          </div>
+        </section>
+
+      {/* ── WHY US ── */}
+      <section className="py-24 px-6" style={{ background: 'var(--color-cream)' }}>
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-xs tracking-widest uppercase font-medium mb-4" style={{ color: 'var(--color-pink)' }}>
+              Why Perfect Fingers
+            </p>
+            <h2 className="font-display text-4xl md:text-5xl font-medium mb-8">What Sets Us Apart</h2>
+            <p className="text-lg max-w-xl mx-auto" style={{ color: 'var(--color-muted)' }}>
+              Precision craftsmanship, comfort-first technique, styles that move with you.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              { icon: '✨', title: 'Tension-Free', desc: 'Proprietary knotless technique eliminates scalp stress while maximizing longevity. Comfort meets durability.' },
+              { icon: '⚡', title: 'Fast Booking', desc: 'Real-time calendar. No phone tag. Deposit locks your slot instantly. In <48hrs from inquiry to install.' },
+              { icon: '👑', title: 'Custom Design', desc: 'Your texture, face shape, lifestyle. Every braid customized — no cookie-cutter installs here.' },
+              { icon: '🎨', title: 'Premium Hair', desc: 'X-Pression, Yanibo, water wave only. Tested for tangle-free removal and maximum shine.' },
+              { icon: '🧼', title: 'Sanitary Standards', desc: 'Fresh braiding hair per client. Sanitized tools. Clean station. Licensed pros only.' },
+              { icon: '⏱️', title: 'Predictable Timing', desc: 'Exact duration quotes. No endless waits. Finish on-time guarantee or discount applied.' }
+            ].map((feature, i) => (
+              <div key={i} className="group text-center hover:-translate-y-2 transition-all duration-300 rounded-3xl p-8 border bg-white shadow-lg hover:shadow-2xl"
+                style={{ borderColor: 'rgba(224,48,112,0.1)' }}>
+                <div className="w-20 h-20 mx-auto mb-6 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform" 
+                  style={{ background: 'var(--color-pink-blush)' }}>
+                  {feature.icon}
+                </div>
+                <h3 className="font-display text-xl font-semibold mb-4 group-hover:text-pink transition-colors">{feature.title}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--color-muted)' }}>{feature.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -138,24 +177,48 @@ export default function Landing() {
         <div className="max-w-6xl mx-auto">
           <p className="text-xs tracking-widest uppercase font-medium mb-2" style={{ color: 'var(--color-pink)' }}>Our Work</p>
           <h2 className="font-display text-4xl md:text-5xl font-medium mb-12">The Portfolio</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="col-span-2 row-span-2 rounded-2xl min-h-64 border-2 border-dashed flex items-center justify-center"
-              style={{ background: 'rgba(224,48,112,0.03)', borderColor: 'rgba(224,48,112,0.15)' }}>
-              <p className="text-xs tracking-widest uppercase" style={{ color: 'var(--color-muted)' }}>Featured Photo</p>
-            </div>
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="rounded-2xl min-h-32 border-2 border-dashed flex items-center justify-center"
-                style={{ background: 'rgba(224,48,112,0.03)', borderColor: 'rgba(224,48,112,0.15)' }}>
-                <p className="text-xs tracking-widest uppercase" style={{ color: 'var(--color-muted)' }}>Photo</p>
-              </div>
+        <div className="grid grid-cols-2 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-4">
+            {[
+              'Hero Shot - Medium Knotless', 'Closeup Detail', 'Goddess Braids Full', 'Side Profile', 'Butterfly Locs Back', 'Lemonade Cornrows', 
+              'Passion Twists Motion', 'Fulani Front', 'Bantu Knots Color', 'Faux Locs Jumbo', 'Bohemian Full Head', 'Wedding Updo Braids',
+              'Kids Cornrows', 'Tribal Designs', 'Triangle Parting', 'Curly Ends Detail', 'Install Progress', 'Fresh Wash Day'
+            ].map((label, i) => (
+              <Link key={i} to="/gallery" className="group rounded-2xl aspect-video border-2 border-dashed hover:border-solid hover:shadow-xl transition-all overflow-hidden bg-gradient-to-br hover:-translate-y-1 hover:scale-[1.02]"
+                style={{ 
+                  background: `linear-gradient(135deg, rgba(224,48,112,0.06), rgba(201,149,106,0.06)), url('data:image/svg+xml,<svg xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 100 100\\"><defs><pattern id=\\"grain\\" width=\\"100\\" height=\\"100\\" patternUnits=\\"userSpaceOnUse\\"><circle cx=\\"25\\" cy=\\"25\\" r=\\"1\\" fill=\\"%23E03070\\" opacity=\\"0.05\\"/><circle cx=\\"75\\" cy=\\"75\\" r=\\"0.8\\" fill=\\"%23C9956A\\" opacity=\\"0.03\\"/></pattern></defs><rect width=\\"100\\" height=\\"100\\" fill=\\"url(%23grain)\\"/></svg>')`,
+                  borderColor: 'rgba(224,48,112,0.2)'
+                }}>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent group-hover:opacity-0 transition-opacity" />
+                <div className="h-full w-full rounded-xl bg-gradient-to-br from-gray-900/20 via-pink-500/5 to-gold/10 flex items-end p-4">
+                  <p className="font-medium text-xs tracking-wide text-white/90 drop-shadow-lg group-hover:text-lg transition-all">
+                    {label}
+                  </p>
+                </div>
+                <div className="absolute top-3 right-3 w-6 h-6 rounded-full flex items-center justify-center text-white bg-white/20 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                  ➤
+                </div>
+              </Link>
             ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <Link to="/gallery" className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-lg font-medium text-white shadow-2xl hover:shadow-3xl hover:-translate-y-1 transition-all bg-gradient-to-r from-pink to-pink-deep"
+              style={{ boxShadow: '0 20px 40px rgba(224,48,112,0.4)' }}>
+              View Full Gallery
+              <span>→</span>
+            </Link>
           </div>
         </div>
       </section>
 
+      {/* ── NEW SECTIONS ── */}
+      <Team />
+      <Testimonials />
+      <FAQ />
+
       {/* ── PAYMENT ── */}
       <section className="py-24 px-6" style={{ background: 'white' }}>
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-6xl mx-auto">  
           <p className="text-xs tracking-widest uppercase font-medium mb-2" style={{ color: 'var(--color-pink)' }}>Payment Info</p>
           <h2 className="font-display text-4xl md:text-5xl font-medium mb-4">Simple & Secure Payment</h2>
           <p className="text-sm leading-relaxed mb-10 max-w-md" style={{ color: 'var(--color-muted)' }}>

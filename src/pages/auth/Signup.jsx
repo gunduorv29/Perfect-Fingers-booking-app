@@ -1,7 +1,11 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { supabase } from '../../supabaseClient'
+import { createClient } from '@supabase/supabase-js'
 import toast from 'react-hot-toast'
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 export default function Signup() {
   const navigate = useNavigate()
@@ -19,20 +23,18 @@ export default function Signup() {
     if (password.length < 6) return toast.error('Password must be at least 6 characters')
     setLoading(true)
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: { data: { full_name: fullName, phone } },
       })
       if (error) throw error
-      // Profile is auto-created by the DB trigger
-      // Update phone separately if provided
-      if (phone) {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (user) {
-          await supabase.from('profiles').update({ phone }).eq('id', user.id)
-        }
+
+      // The user object is already inside `data` — no extra network call needed
+      if (phone && data?.user) {
+        await supabase.from('profiles').update({ phone }).eq('id', data.user.id)
       }
+
       toast.success('Account created! Welcome to Perfect Finger Braids.')
       navigate('/services')
     } catch (err) {
@@ -45,7 +47,7 @@ export default function Signup() {
   return (
     <div className="min-h-screen flex" style={{ background: 'var(--color-cream)' }}>
       {/* Left panel */}
-      <div className="hidden lg:flex flex-col justify-between w-96 p-10 flex-shrink-0"
+      <div className="hidden lg:flex flex-col justify-between w-96 p-10 shrink-0"
         style={{ background: 'linear-gradient(160deg, var(--color-dark) 0%, var(--color-dark-mid) 100%)' }}>
         <Link to="/" className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-semibold font-display border-2"
@@ -61,7 +63,7 @@ export default function Signup() {
           <ul className="flex flex-col gap-2.5">
             {['Easy online booking 24/7', 'Your appointments in one place', 'Manage & cancel anytime'].map(item => (
               <li key={item} className="flex items-center gap-2.5 text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                <span className="w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center text-xs text-white"
+                <span className="w-4 h-4 rounded-full shrink-0 flex items-center justify-center text-xs text-white"
                   style={{ background: 'var(--color-pink)' }}>✓</span>
                 {item}
               </li>

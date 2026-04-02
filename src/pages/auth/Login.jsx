@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
 import { supabase } from '../../supabaseClient'
 import toast from 'react-hot-toast'
 
 export default function Login() {
+  const { user, loading: authLoading } = useAuth()
   const navigate  = useNavigate()
   const location  = useLocation()
   const from      = location.state?.from?.pathname ?? '/dashboard'
@@ -18,6 +20,13 @@ export default function Login() {
   const [resetEmail,  setResetEmail]  = useState('')
   const [resetSent,   setResetSent]   = useState(false)
   const [resetLoading, setResetLoading] = useState(false)
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (!authLoading && user) {
+      navigate(from || '/dashboard', { replace: true })
+    }
+  }, [authLoading, user, navigate, from])
 
   async function handleLogin(e) {
     e.preventDefault()
@@ -55,7 +64,7 @@ export default function Login() {
   return (
     <div className="min-h-screen flex" style={{ background: 'var(--color-cream)' }}>
       {/* Left panel */}
-      <div className="hidden lg:flex flex-col justify-between w-96 p-10 flex-shrink-0"
+      <div className="hidden lg:flex flex-col justify-between w-96 p-10 shrink-0"
         style={{ background: 'linear-gradient(160deg, var(--color-dark) 0%, var(--color-dark-mid) 100%)' }}>
         <Link to="/" className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-semibold font-display border-2"
