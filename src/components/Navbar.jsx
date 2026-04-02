@@ -1,23 +1,9 @@
 import { useState } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
-import toast from 'react-hot-toast'
+import { Link, useLocation } from 'react-router-dom'
 
 export default function Navbar() {
-  const { user, profile, signOut } = useAuth()
-  const navigate = useNavigate()
   const location = useLocation()
   const [mobileOpen, setMobileOpen] = useState(false)
-
-  const isAdmin   = profile?.role === 'admin'
-  const firstName = profile?.full_name?.split(' ')[0] ?? 'there'
-
-  async function handleSignOut() {
-    await signOut()
-    toast.success('Signed out successfully')
-    navigate('/')
-    setMobileOpen(false)
-  }
 
   const navLink = (href, label) => (
     <Link
@@ -52,35 +38,22 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-8">
           {navLink('/', 'Home')}
           {navLink('/services', 'Services')}
-          {user && !isAdmin && navLink('/dashboard', 'My Bookings')}
-          {isAdmin && navLink('/admin', 'Dashboard')}
+          {navLink('/dashboard', 'Dashboard')}
+          {navLink('/admin', 'Admin')}
         </div>
 
-        {/* Desktop auth */}
+        {/* Auth buttons - simplified */}
         <div className="hidden md:flex items-center gap-3">
-          {user ? (
-            <div className="flex items-center gap-3">
-              <span className="text-sm" style={{ color: 'var(--color-muted)' }}>Hi, {firstName}</span>
-              <button onClick={handleSignOut}
-                className="text-sm px-4 py-2 rounded-full border font-medium hover:opacity-80"
-                style={{ borderColor: 'rgba(224,48,112,0.25)', color: 'var(--color-pink)' }}>
-                Sign Out
-              </button>
-            </div>
-          ) : (
-            <>
-              <Link to="/login"
-                className="text-sm font-medium hover:text-pink transition-colors"
-                style={{ color: 'var(--color-muted)' }}>
-                Log In
-              </Link>
-              <Link to="/signup"
-                className="text-sm font-medium px-5 py-2.5 rounded-full text-white hover:opacity-90"
-                style={{ background: 'linear-gradient(135deg, var(--color-pink), var(--color-pink-deep))' }}>
-                Book Now
-              </Link>
-            </>
-          )}
+          <Link to="/login"
+            className="text-sm font-medium hover:text-pink transition-colors"
+            style={{ color: 'var(--color-muted)' }}>
+            Log In
+          </Link>
+          <Link to="/book"
+            className="text-sm font-medium px-5 py-2.5 rounded-full text-white hover:opacity-90"
+            style={{ background: 'linear-gradient(135deg, var(--color-pink), var(--color-pink-deep))' }}>
+            Book Now
+          </Link>
         </div>
 
         {/* Mobile hamburger */}
@@ -100,28 +73,18 @@ export default function Navbar() {
           style={{ background: 'var(--color-cream)', borderColor: 'rgba(224,48,112,0.08)' }}>
           {navLink('/', 'Home')}
           {navLink('/services', 'Services')}
-          {user && !isAdmin && navLink('/dashboard', 'My Bookings')}
-          {isAdmin && navLink('/admin', 'Admin Dashboard')}
+          {navLink('/dashboard', 'Dashboard')}
+          {navLink('/admin', 'Admin')}
           <div className="pt-2 border-t flex flex-col gap-3" style={{ borderColor: 'rgba(224,48,112,0.08)' }}>
-            {user ? (
-              <button onClick={handleSignOut}
-                className="text-sm font-medium px-4 py-2.5 rounded-full text-left"
-                style={{ color: 'var(--color-pink)', background: 'var(--color-pink-blush)' }}>
-                Sign Out
-              </button>
-            ) : (
-              <>
-                <Link to="/login" onClick={() => setMobileOpen(false)}
-                  className="text-sm font-medium" style={{ color: 'var(--color-muted)' }}>
-                  Log In
-                </Link>
-                <Link to="/signup" onClick={() => setMobileOpen(false)}
-                  className="text-sm font-medium px-5 py-2.5 rounded-full text-white text-center"
-                  style={{ background: 'linear-gradient(135deg, var(--color-pink), var(--color-pink-deep))' }}>
-                  Book Now
-                </Link>
-              </>
-            )}
+            <Link to="/login" onClick={() => setMobileOpen(false)}
+              className="text-sm font-medium" style={{ color: 'var(--color-muted)' }}>
+              Log In
+            </Link>
+            <Link to="/book" onClick={() => setMobileOpen(false)}
+              className="text-sm font-medium px-5 py-2.5 rounded-full text-white text-center"
+              style={{ background: 'linear-gradient(135deg, var(--color-pink), var(--color-pink-deep))' }}>
+              Book Now
+            </Link>
           </div>
         </div>
       )}

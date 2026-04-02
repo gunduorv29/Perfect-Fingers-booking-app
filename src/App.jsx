@@ -2,8 +2,6 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider } from './context/AuthContext'
-import ProtectedRoute from './components/ProtectedRoute'
-import AdminRoute from './components/AdminRoute'
 import Navbar from './components/Navbar'
 
 import Landing from './pages/Landing'
@@ -29,15 +27,9 @@ export default function App() {
             <Route path="/login"    element={<Login />} />
             <Route path="/signup"   element={<Signup />} />
             <Route path="/reset-password" element={<ResetPassword />} />
-
-            <Route element={<ProtectedRoute />}>
-              <Route path="/book"      element={<Book />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-            </Route>
-
-            <Route element={<AdminRoute />}>
-              <Route path="/admin" element={<AdminDashboard />} />
-            </Route>
+            <Route path="/book"      element={<Book />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/admin"     element={<AdminDashboard />} />
           </Routes>
           <Toaster
             position="top-right"
