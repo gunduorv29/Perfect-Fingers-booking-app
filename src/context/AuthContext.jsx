@@ -1,25 +1,10 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-
-// Mocking the supabase client for the isolated preview environment
-const supabase = {
-  auth: {
-    getSession: async () => ({ data: { session: null } }),
-    onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
-    signOut: async () => {}
-  },
-  from: () => ({
-    select: () => ({
-      eq: () => ({
-        single: async () => ({ data: null, error: null })
-      })
-    })
-  })
-}
+import { supabase } from '../supabaseClient'
 
 const AuthContext = createContext({})
 
 export function AuthProvider({ children }) {
-  const [user, setUser]       = useState(null)
+  const [user,    setUser]    = useState(null)
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
 
@@ -28,23 +13,26 @@ export function AuthProvider({ children }) {
 
     async function initializeAuth() {
       const { data: { session } } = await supabase.auth.getSession()
-      if (mounted) {
-        setUser(session?.user ?? null)
-        if (session?.user) await fetchProfile(session.user.id)
-        else setLoading(false)
+      if (!mounted) return
+      setUser(session?.user ?? null)
+      if (session?.user) {
+        await fetchProfile(session.user.id)
+      } else {
+        setLoading(false)
       }
     }
+
     initializeAuth()
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
-        // INITIAL_SESSION is already handled by initializeAuth above — skip it
-        // to prevent a duplicate profile fetch on mount
+        // Skip INITIAL_SESSION — already handled by initializeAuth above
         if (_event === 'INITIAL_SESSION') return
 
         setUser(session?.user ?? null)
-        if (session?.user) await fetchProfile(session.user.id)
-        else {
+        if (session?.user) {
+          await fetchProfile(session.user.id)
+        } else {
           setProfile(null)
           setLoading(false)
         }
@@ -64,7 +52,7 @@ export function AuthProvider({ children }) {
         .select('*')
         .eq('id', userId)
         .single()
-      if (!error) setProfile(data)
+      if (!error && data) setProfile(data)
     } catch (err) {
       console.error('fetchProfile error:', err)
     } finally {
@@ -78,7 +66,13 @@ export function AuthProvider({ children }) {
     setProfile(null)
   }
 
-  const value = { user, profile, loading, signOut, refetchProfile: () => user && fetchProfile(user.id) }
+  const value = {
+    user,
+    profile,
+    loading,
+    signOut,
+    refetchProfile: () => user && fetchProfile(user.id),
+  }
 
   return (
     <AuthContext.Provider value={value}>
@@ -87,6 +81,5 @@ export function AuthProvider({ children }) {
   )
 }
 
-// Bypass the Fast Refresh linting rule for this specific hook export
 // eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext)
