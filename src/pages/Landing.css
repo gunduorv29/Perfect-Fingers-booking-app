@@ -1,26 +1,29 @@
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+/* Scoped Landing page styles - no global selectors */
 
+/* The Design System (Global Overrides) */
 :root {
-  --pink:        #E03070;
-  --pink-deep:   #B81F52;
-  --pink-pale:   #FFD6E7;
-  --pink-blush:  #FFF0F6;
-  --gold:        #C9956A;
-  --gold-light:  #E8C9A8;
-  --cream:       #FFF8F3;
-  --dark:        #180810;
-  --dark-mid:    #3A1225;
-  --muted:       #8B5468;
-  --white:       #FFFFFF;
+  --color-pink: #e03070;
+  --color-pink-deep: #b02050;
+  --color-pink-pale: #fff0f5;
+  --color-gold: #c9956a;
+  --color-cream: #fff8f3;
+  --color-dark: #180810;
+  --color-muted: #6b5a62;
+  
+  /* The "Professional" Secret: Soft Shadows */
+  --shadow-elegant: 0 10px 40px -10px rgba(24, 8, 16, 0.08);
+  --shadow-hover: 0 20px 50px -12px rgba(224, 48, 112, 0.15);
 }
 
-html { scroll-behavior: smooth; }
+.font-display {
+  letter-spacing: -0.02em; /* Tighten large serifs */
+}
 
-body {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--cream);
-  color: var(--dark);
-  overflow-x: hidden;
+.text-sophisticated {
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  font-weight: 600;
 }
 
 /* ── NAV ── */
@@ -33,35 +36,35 @@ body {
   border-bottom: 1px solid rgba(224,48,112,0.08);
 }
 
-.nav-brand { display: flex; align-items: center; gap: 0.85rem; text-decoration: none; }
-.nav-logo-circle {
+.landing-nav-brand { display: flex; align-items: center; gap: 0.85rem; text-decoration: none; }
+.landing-nav-logo-circle {
   width: 44px; height: 44px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--pink), var(--pink-deep));
-  border: 2px solid var(--gold);
+  background: linear-gradient(135deg, var(--color-pink), var(--color-pink-deep));
+  border: 2px solid var(--color-gold);
   display: flex; align-items: center; justify-content: center;
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.05rem; font-weight: 600; color: white; letter-spacing: 1px;
 }
-.nav-name {
+.landing-nav-name {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 1.15rem; color: var(--dark); font-weight: 500; letter-spacing: 0.02em;
+  font-size: 1.15rem; color: var(--color-dark); font-weight: 500; letter-spacing: 0.02em;
 }
 
-.nav-links { display: flex; gap: 2.5rem; list-style: none; }
-.nav-links a {
-  text-decoration: none; color: var(--muted);
+.landing-nav-links { display: flex; gap: 2.5rem; list-style: none; }
+.landing-nav-links a {
+  text-decoration: none; color: var(--color-muted);
   font-size: 0.875rem; font-weight: 400; letter-spacing: 0.03em;
   transition: color 0.2s;
 }
-.nav-links a:hover { color: var(--pink); }
+.landing-nav-links a:hover { color: var(--color-pink); }
 
-.btn-nav {
-  background: var(--pink); color: white; border: none;
+.landing-btn-nav {
+  background: var(--color-pink); color: white; border: none;
   padding: 0.6rem 1.5rem; border-radius: 2rem;
   font: 500 0.875rem/1 'DM Sans', sans-serif;
   cursor: pointer; letter-spacing: 0.03em; transition: background 0.2s;
 }
-.btn-nav:hover { background: var(--pink-deep); }
+.landing-btn-nav:hover { background: var(--color-pink-deep); }
 
 /* ── HERO ── */
 .landing-hero {

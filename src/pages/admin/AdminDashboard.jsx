@@ -1,9 +1,10 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { supabase } from '../../supabaseClient'
+import { supabase } from "../../supabaseClient"
 import { format, parseISO, isToday, subDays } from 'date-fns'
 import toast from 'react-hot-toast'
 import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer } from 'recharts'
+import AvailabilityManager from '../../components/AvailabilityManager'
 
 const STATUS = {
   pending:   { bg: 'rgba(201,149,106,0.1)', text: '#A07040', label: 'Pending' },
@@ -501,7 +502,23 @@ export default function AdminDashboard() {
 
         {/* ── Services Tab ── */}
         {mainTab === 'services' && <ServicesManager />}
+        
+        {/* ── Availability Tab */}
+        {mainTab === 'availability' && <AvailabilityManager />}
+      </div>
 
+      {/* Tab switcher for admin */}
+      <div className="flex gap-2 mt-8 p-1.5 w-fit mx-auto rounded-2xl bg-white/60 backdrop-blur-md shadow-sm" style={{ borderColor: 'rgba(224,48,112,0.08)', borderWidth: 1 }}>
+        {[['appointments', '📅 Appointments'], ['services', '✦ Services'], ['availability', '📅 Availability']].map(([key, label]) => (
+          <button key={key} onClick={() => setMainTab(key)}
+            className={`px-6 py-2.5 text-sm font-medium rounded-xl transition-all duration-300 ${mainTab === key ? 'shadow-sm' : 'hover:opacity-70'}`}
+            style={{
+              background: mainTab === key ? 'white' : 'transparent',
+              color: mainTab === key ? 'var(--color-pink-deep)' : 'var(--color-muted)',
+            }}>
+            {label}
+          </button>
+        ))}
       </div>
     </div>
   )

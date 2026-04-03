@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 
 export default function Navbar() {
+  const { user, profile, signOut } = useAuth()
   const location = useLocation()
   const [mobileOpen, setMobileOpen] = useState(false)
 
@@ -38,17 +40,26 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-8">
           {navLink('/', 'Home')}
           {navLink('/services', 'Services')}
-          {navLink('/dashboard', 'Dashboard')}
-          {navLink('/admin', 'Admin')}
+          {user && navLink(profile?.role === 'admin' ? '/admin' : '/dashboard', profile?.role === 'admin' ? 'Admin' : 'Dashboard')}
         </div>
 
-        {/* Auth buttons - simplified */}
+        {/* Auth buttons */}
         <div className="hidden md:flex items-center gap-3">
-          <Link to="/login"
-            className="text-sm font-medium hover:text-pink transition-colors"
-            style={{ color: 'var(--color-muted)' }}>
-            Log In
-          </Link>
+          {!user ? (
+            <Link to="/login"
+              className="text-sm font-medium hover:text-pink transition-colors"
+              style={{ color: 'var(--color-muted)' }}>
+              Log In
+            </Link>
+          ) : (
+            <>
+              <button onClick={signOut}
+                className="text-sm font-medium hover:text-pink transition-colors"
+                style={{ color: 'var(--color-muted)' }}>
+                Log Out
+              </button>
+            </>
+          )}
           <Link to="/book"
             className="text-sm font-medium px-5 py-2.5 rounded-full text-white hover:opacity-90"
             style={{ background: 'linear-gradient(135deg, var(--color-pink), var(--color-pink-deep))' }}>
@@ -67,19 +78,27 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* Mobile menu */}
+        {/* Mobile menu */}
       {mobileOpen && (
         <div className="md:hidden border-t px-6 py-4 flex flex-col gap-4"
           style={{ background: 'var(--color-cream)', borderColor: 'rgba(224,48,112,0.08)' }}>
           {navLink('/', 'Home')}
           {navLink('/services', 'Services')}
-          {navLink('/dashboard', 'Dashboard')}
-          {navLink('/admin', 'Admin')}
+          {user && navLink(profile?.role === 'admin' ? '/admin' : '/dashboard', profile?.role === 'admin' ? 'Admin' : 'Dashboard')}
           <div className="pt-2 border-t flex flex-col gap-3" style={{ borderColor: 'rgba(224,48,112,0.08)' }}>
-            <Link to="/login" onClick={() => setMobileOpen(false)}
-              className="text-sm font-medium" style={{ color: 'var(--color-muted)' }}>
-              Log In
-            </Link>
+            {!user ? (
+              <Link to="/login" onClick={() => setMobileOpen(false)}
+                className="text-sm font-medium" style={{ color: 'var(--color-muted)' }}>
+                Log In
+              </Link>
+            ) : (
+              <button onClick={() => {
+                signOut()
+                setMobileOpen(false)
+              }} className="text-sm font-medium text-left" style={{ color: 'var(--color-muted)' }}>
+                Log Out
+              </button>
+            )}
             <Link to="/book" onClick={() => setMobileOpen(false)}
               className="text-sm font-medium px-5 py-2.5 rounded-full text-white text-center"
               style={{ background: 'linear-gradient(135deg, var(--color-pink), var(--color-pink-deep))' }}>

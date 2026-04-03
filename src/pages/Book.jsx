@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
-import { useSearchParams, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { supabase } from '../supabaseClient'
-import { useAuth } from '../context/AuthContext'
-import toast from 'react-hot-toast'
+import { useAuth } from "../context/AuthContext";
+import toast from "react-hot-toast";
 import {
   format, addMonths, startOfMonth, endOfMonth,
   eachDayOfInterval, isSameDay, isBefore, startOfDay, getDay, addWeeks
@@ -61,7 +61,8 @@ export default function Book() {
   const { user, profile } = useAuth()
   const navigate           = useNavigate()
   const [params]           = useSearchParams()
-  const preselectedId      = params.get('service')
+  const preselectedIdRaw   = params.get('service')
+  const preselectedId      = preselectedIdRaw && preselectedIdRaw !== 'demo' ? preselectedIdRaw : null
 
   // View: 'home' = accordion | 'information' = checkout form
   const [view, setView]           = useState('home')

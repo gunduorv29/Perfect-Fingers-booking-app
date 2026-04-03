@@ -12,6 +12,7 @@ export default function ResetPassword() {
   const [loading,      setLoading]      = useState(false)
   const [validSession, setValidSession] = useState(false)
   const [checking,     setChecking]     = useState(true)
+  const [matchError,   setMatchError]   = useState(false)
 
   useEffect(() => {
     // Supabase embeds the token in the URL hash as:
@@ -38,8 +39,7 @@ export default function ResetPassword() {
       return
     }
 
-    // Fallback: listen for the PASSWORD_RECOVERY event (fires if the client
-    // detected the hash before this component mounted)
+    // Fallback: listen for PASSWORD_RECOVERY event
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY') {
         setValidSession(true)
@@ -47,7 +47,7 @@ export default function ResetPassword() {
       }
     })
 
-    // If neither fires within 3s, assume the link is invalid/expired
+    // 3s timeout fallback
     const timeout = setTimeout(() => setChecking(false), 3000)
 
     return () => {
@@ -56,11 +56,16 @@ export default function ResetPassword() {
     }
   }, [])
 
+  // Real-time confirm match validation
+  useEffect(() => {
+    setMatchError(password.length > 0 && confirm.length > 0 && password !== confirm)
+  }, [password, confirm])
+
   async function handleReset(e) {
     e.preventDefault()
     if (!password || !confirm) return toast.error('Please fill in both fields.')
     if (password.length < 6)   return toast.error('Password must be at least 6 characters.')
-    if (password !== confirm)  return toast.error('Passwords do not match.')
+    if (matchError)            return toast.error('Passwords do not match.')
 
     setLoading(true)
     try {
@@ -182,25 +187,61 @@ export default function ResetPassword() {
                     value={confirm}
                     onChange={e => setConfirm(e.target.value)}
                     placeholder="Re-enter password"
-                    className="w-full px-4 py-3 rounded-xl border text-sm outline-none transition-colors"
-                    style={{ borderColor: 'rgba(224,48,112,0.2)', background: 'white', fontFamily: 'var(--font-body)' }}
+                    className={`w-full px-4 py-3 rounded-xl border text-sm outline-none transition-colors ${
+                      matchError ? 'border-red-300 ring-1 ring-red-200' : ''
+                    }`}
+                    style={{ 
+                      borderColor: matchError ? '#f87171' : 'rgba(224,48,112,0.2)', 
+                      background: 'white', 
+                      fontFamily: 'var(--font-body)' 
+                    }}
                   />
+                  {matchError && (
+                    <p className="text-xs mt-1" style={{ color: '#f87171' }}>
+                      Passwords do not match
+                    </p>
+                  )}
                 </div>
 
-                {/* Strength bar */}
-                {password.length > 0 && (
-                  <div className="flex gap-1.5">
-                    {[1, 2, 3, 4].map(i => (
-                      <div key={i} className="flex-1 h-1 rounded-full transition-all"
-                        style={{
-                          background: password.length >= i * 3
-                            ? i <= 1 ? '#ef4444'
-                            : i <= 2 ? '#f97316'
-                            : i <= 3 ? '#eab308'
-                            : '#22c55e'
-                            : 'rgba(224,48,112,0.1)'
-                        }} />
-                    ))}
+                {/* Dual strength bars */}
+                {(password.length > 0 || confirm.length > 0) && (
+                  <div className="space-y-1">
+                    {password.length > 0 && (
+                      <div>
+                        <span className="text-xs" style={{ color: 'var(--color-muted)' }}>Password</span>
+                        <div className="flex gap-1.5 mt-1">
+                          {[1, 2, 3, 4].map(i => (
+                            <div key={`p${i}`} className="flex-1 h-1 rounded-full transition-all"
+                              style={{
+                                background: password.length >= i * 3
+                                  ? i <= 1 ? '#ef4444'
+                                  : i <= 2 ? '#f97316'
+                                  : i <= 3 ? '#eab308'
+                                  : '#22c55e'
+                                  : 'rgba(224,48,112,0.1)'
+                              }} />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {confirm.length > 0 && (
+                      <div>
+                        <span className="text-xs" style={{ color: 'var(--color-muted)' }}>Confirm</span>
+                        <div className="flex gap-1.5 mt-1">
+                          {[1, 2, 3, 4].map(i => (
+                            <div key={`c${i}`} className="flex-1 h-1 rounded-full transition-all"
+                              style={{
+                                background: confirm.length >= i * 3 && !matchError
+                                  ? i <= 1 ? '#ef4444'
+                                  : i <= 2 ? '#f97316'
+                                  : i <= 3 ? '#eab308'
+                                  : '#22c55e'
+                                  : matchError ? '#f87171' : 'rgba(224,48,112,0.1)'
+                              }} />
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
 

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from '../supabaseClient'
 
 const AuthContext = createContext({})
@@ -45,14 +45,36 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
-  async function fetchProfile(userId) {
+  async function fetchProfile(userId, retryCount = 0) {
     try {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .single()
-      if (!error && data) setProfile(data)
+      
+      if (error) {
+        // Retry once on network/RLS error
+        if (retryCount === 0 && (error.message.includes('network') || error.message.includes('RLS'))) {
+          console.warn('Profile fetch failed, retrying:', error.message)
+          return fetchProfile(userId, 1)
+        }
+        console.error('fetchProfile error:', error)
+        return
+      }
+      
+      if (data) {
+        setProfile(data)
+      } else {
+        // No profile yet - create minimal
+        const { error: createError } = await supabase
+          .from('profiles')
+          .insert({ id: userId, full_name: userId.split('@')[0], role: 'client' })
+        if (!createError) {
+          // Refetch after create
+          return fetchProfile(userId, retryCount + 1)
+        }
+      }
     } catch (err) {
       console.error('fetchProfile error:', err)
     } finally {

@@ -5,6 +5,8 @@ import { AuthProvider } from './context/AuthContext'
 import Navbar from './components/Navbar'
 
 import Landing from './pages/Landing'
+import Gallery from './pages/Gallery'
+import NotFound from './pages/NotFound'
 import Services from './pages/Services'
 import Book from './pages/Book'
 import Login from './pages/auth/Login'
@@ -26,6 +28,7 @@ export default function App() {
           <Routes>
             {/* Public */}
             <Route path="/"               element={<Landing />} />
+            <Route path="/gallery"        element={<Gallery />} />
             <Route path="/services"       element={<Services />} />
             <Route path="/login"          element={<Login />} />
             <Route path="/signup"         element={<Signup />} />
@@ -45,6 +48,9 @@ export default function App() {
             <Route element={<AdminRoute />}>
               <Route path="/admin" element={<AdminDashboard />} />
             </Route>
+
+            {/* 404 Catch-all */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
 
           <Toaster

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+
 import { supabase } from '../../supabaseClient'
 import toast from 'react-hot-toast'
 
@@ -26,13 +27,15 @@ export default function Signup() {
       })
       if (error) throw error
 
-      // The user object is inside `data` — no extra network call needed
-      if (phone && data?.user) {
-        await supabase.from('profiles').update({ phone }).eq('id', data.user.id)
+      // Check if email confirmation required (Supabase default)
+      if (data.session) {
+        toast.success('Account created! Welcome to Perfect Finger Braids.')
+        navigate('/dashboard')
+      } else {
+        // Email confirmation required - user created but no session
+        toast.success('Account created! Check your email to verify and start booking.')
+        navigate('/login')
       }
-
-      toast.success('Account created! Welcome to Perfect Finger Braids.')
-      navigate('/services')
     } catch (err) {
       toast.error(err.message ?? 'Signup failed. Please try again.')
     } finally {

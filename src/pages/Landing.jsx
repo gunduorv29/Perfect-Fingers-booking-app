@@ -42,7 +42,7 @@ export default function Landing() {
               Now Accepting Bookings
             </div>
 
-            <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-medium leading-tight mb-6">
+            <h1 className="font-display text-6xl md:text-8xl font-medium leading-tight mb-6">
               Where Every<br />
               <em className="not-italic" style={{ color: 'var(--color-pink)' }}>Braid</em> Tells<br />
               Your Story.
@@ -330,7 +330,7 @@ function PayCard({ brand, brandColor, info, note, btnLabel, onAction }) {
 }
 
 const PLACEHOLDER_SERVICES = [
-  { id: '1', name: 'Knotless Box Braids', description: 'Lightweight, tension-free braids that start with your natural hair. Beginner-friendly and long-lasting.', price: 120, duration: 180, icon: '🌿' },
-  { id: '2', name: 'Goddess Braids', description: 'Bohemian braids with curly ends for a romantic look perfect for any occasion.', price: 140, duration: 240, icon: '🌸' },
-  { id: '3', name: 'Passion Twists', description: 'Lightweight twists with wavy hair for a textured, effortless look with incredible bounce.', price: 150, duration: 240, icon: '🌀' },
+  { id: 'p1', name: 'Knotless Box Braids', description: 'Lightweight, tension-free braids that start with your natural hair. Beginner-friendly and long-lasting.', price: 120, duration: 180, icon: '🌿' },
+  { id: 'p2', name: 'Goddess Braids', description: 'Bohemian braids with curly ends for a romantic look perfect for any occasion.', price: 140, duration: 240, icon: '🌸' },
+  { id: 'p3', name: 'Passion Twists', description: 'Lightweight twists with wavy hair for a textured, effortless look with incredible bounce.', price: 150, duration: 240, icon: '🌀' },
 ]

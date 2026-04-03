@@ -40,7 +40,7 @@ export default function Services() {
           <p className="text-xs tracking-widest uppercase font-medium mb-2" style={{ color: 'var(--color-pink)' }}>
             Our Offerings
           </p>
-          <h1 className="font-display text-4xl md:text-5xl font-medium">Services &amp; Pricing</h1>
+          <h1 className="font-display text-4xl md:text-5xl font-medium">Services & Pricing</h1>
           <p className="text-sm mt-4 max-w-md mx-auto" style={{ color: 'var(--color-muted)' }}>
             All services include consultation, shampoo, and blowdry. Deposit required at booking.
           </p>
@@ -48,18 +48,15 @@ export default function Services() {
 
         {/* Connection warning when falling back to placeholders */}
         {isError && (
-          <div
-            className="flex items-start gap-3 px-4 py-3 rounded-xl mb-8 text-xs leading-relaxed max-w-2xl mx-auto"
-            style={{ background: 'rgba(201,149,106,0.07)', border: '1px solid rgba(201,149,106,0.18)', color: 'var(--color-muted)' }}
-          >
-            <span className="text-sm mt-0.5">⚠️</span>
-            <p>
-              Could not reach the database — showing sample services. Add{' '}
-              <code className="px-1 rounded" style={{ background: 'rgba(0,0,0,0.06)' }}>VITE_SUPABASE_URL</code>{' '}
-              and{' '}
-              <code className="px-1 rounded" style={{ background: 'rgba(0,0,0,0.06)' }}>VITE_SUPABASE_ANON_KEY</code>{' '}
-              to your <code className="px-1 rounded" style={{ background: 'rgba(0,0,0,0.06)' }}>.env</code>{' '}
-              file, then run the seed SQL.
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-8 max-w-2xl mx-auto text-xs leading-relaxed">
+            <div className="flex items-start gap-2 mb-2">
+              <span className="text-amber-500 mt-0.5">⚠️</span>
+              <strong>Database temporarily unavailable</strong>
+            </div>
+            <p className="text-amber-800">
+              Showing demo services. Your booking will work once{' '}
+              <code className="px-1 py-0.5 bg-amber-100 rounded text-xs">VITE_SUPABASE_*</code>{' '}
+              vars are added to <code>.env.local</code> + services table seeded.
             </p>
           </div>
         )}
@@ -77,49 +74,62 @@ export default function Services() {
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {displayServices.map(svc => (
-              <div
-                key={svc.id}
-                className="rounded-2xl p-6 border flex flex-col justify-between hover:shadow-lg transition-shadow duration-300"
-                style={{ background: 'white', borderColor: 'rgba(224,48,112,0.07)' }}
-              >
-                <div>
-                  <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl mb-4"
-                    style={{ background: 'var(--color-pink-blush)' }}
-                  >
-                    {svc.icon ?? '✦'}
-                  </div>
-                  <h3 className="font-display text-xl font-medium mb-2">{svc.name}</h3>
-                  <p className="text-sm mb-6 leading-relaxed" style={{ color: 'var(--color-muted)' }}>
-                    {svc.description}
-                  </p>
-                </div>
-
+            {displayServices.map(svc => {
+              const serviceId = usingPlaceholders ? 'demo' : svc.id
+              const isDemo = usingPlaceholders || !svc.id
+              
+              return (
                 <div
-                  className="flex items-end justify-between pt-4 border-t"
-                  style={{ borderColor: 'rgba(224,48,112,0.06)' }}
+                  key={svc.id}
+                  className="rounded-2xl p-6 border flex flex-col justify-between hover:shadow-lg transition-shadow duration-300"
+                  style={{ background: 'white', borderColor: 'rgba(224,48,112,0.07)' }}
                 >
                   <div>
-                    <p className="font-display text-xl font-semibold" style={{ color: 'var(--color-pink-deep)' }}>
-                      from ${svc.price}
-                    </p>
-                    <p className="text-xs mt-1" style={{ color: 'var(--color-muted)' }}>
-                      {Math.floor(svc.duration / 60)}h{svc.duration % 60 > 0 ? ` ${svc.duration % 60}m` : ''}
-                      {svc.deposit ? ` · $${svc.deposit} deposit` : ''}
+                    <div
+                      className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl mb-4"
+                      style={{ background: isDemo ? 'var(--color-cream)' : 'var(--color-pink-blush)' }}
+                    >
+                      {svc.icon ?? '✦'}
+                    </div>
+                    <h3 className="font-display text-xl font-medium mb-2">{svc.name}</h3>
+                    <p className="text-sm mb-6 leading-relaxed" style={{ color: 'var(--color-muted)' }}>
+                      {svc.description}
                     </p>
                   </div>
 
-                  <button
-                    onClick={() => navigate(`/book?service=${usingPlaceholders ? '' : svc.id}`)}
-                    className="px-5 py-2.5 rounded-full text-sm font-medium text-white transition-opacity hover:opacity-90"
-                    style={{ background: 'linear-gradient(135deg, var(--color-pink), var(--color-pink-deep))' }}
+                  <div
+                    className="flex items-end justify-between pt-4 border-t"
+                    style={{ borderColor: 'rgba(224,48,112,0.06)' }}
                   >
-                    Book
-                  </button>
+                    <div>
+                      <p className="font-display text-xl font-semibold" style={{ color: 'var(--color-pink-deep)' }}>
+                        from ${svc.price}
+                      </p>
+                      <p className="text-xs mt-1" style={{ color: 'var(--color-muted)' }}>
+                        {Math.floor(svc.duration / 60)}h{svc.duration % 60 > 0 ? ` ${svc.duration % 60}m` : ''}
+                        {svc.deposit ? ` · $${svc.deposit} deposit` : ''}
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        if (!isDemo) navigate(`/book?service=${serviceId}`)
+                      }}
+                      disabled={isDemo}
+                      className="px-5 py-2.5 rounded-full text-sm font-medium text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none hover:scale-105 active:scale-95"
+                      style={{ 
+                        background: isDemo 
+                          ? 'var(--color-muted)' 
+                          : 'linear-gradient(135deg, var(--color-pink), var(--color-pink-deep))' 
+                      }}
+                    >
+                      {isDemo ? 'Coming Soon' : 'Book'}
+
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>

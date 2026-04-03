@@ -30,10 +30,12 @@ export default function Login() {
 
   async function handleLogin(e) {
     e.preventDefault()
-    if (!email || !password) return toast.error('Please fill in all fields.')
+    const trimmedEmail = email.trim()
+    const trimmedPassword = password.trim()
+    if (!trimmedEmail || !trimmedPassword) return toast.error('Please fill in all fields.')
     setLoading(true)
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      const { error } = await supabase.auth.signInWithPassword({ email: trimmedEmail, password: trimmedPassword })
       if (error) throw error
       toast.success('Welcome back!')
       navigate(from, { replace: true })
@@ -208,11 +210,16 @@ export default function Login() {
                     </label>
                     <button
                       type="button"
-                      onClick={() => { setForgotMode(true); setResetEmail(email) }}
+                      onClick={() => { 
+                        setResetEmail(email.trim())
+                        toast('Using your login email as a shortcut.')
+                        setForgotMode(true) 
+                      }}
                       className="text-xs font-medium hover:opacity-70 transition-opacity"
                       style={{ color: 'var(--color-pink)' }}
                     >
                       Forgot password?
+
                     </button>
                   </div>
                   <div className="relative">
