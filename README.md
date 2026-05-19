@@ -21,6 +21,6 @@ A full-stack, responsive web application engineered to handle real-time appointm
 ## 🔧 Local Development & Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com
+   git clone https://github.com/gunduorv29/Perfect-Fingers-booking-app.git
    ```
 2. Open the directory and launch your preferred local server environment to view the deployment.
